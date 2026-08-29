@@ -1,80 +1,135 @@
-# Jenkins-Tomcat-Deployment
-# Jenkins FreeStyle Job: WAR Deployment on Tomcat
+# Jenkins Tomcat Deployment - Freestyle Job
+# 🚀 Jenkins FreeStyle CI/CD – Maven WAR Deployment to Tomcat & Amazon S3
 
-## Project Overview
+## 📌 Project Overview
 
-This project demonstrates how to build and deploy a Java Maven web application using a **Jenkins FreeStyle Job**.
+This project demonstrates a basic CI/CD workflow using a **Jenkins FreeStyle Job** to build and deploy a Java Maven web application.
 
-Jenkins pulls the source code from GitHub, builds the application with Maven, packages it as a `.war` artifact, deploys the WAR file to an Apache Tomcat server, and finally stores the WAR artifact in an Amazon S3 bucket for centralized artifact storage.
+The source code is stored in GitHub. Jenkins checks out the source code, builds the application using Maven, executes tests, generates a WAR artifact, deploys the WAR file to an Apache Tomcat server, and stores the WAR artifact in an Amazon S3 bucket.
 
-### Project Flow
+The project uses separate AWS EC2 instances for Jenkins and Tomcat.
+
+---
+
+## 🎯 Project Objective
+
+The main objective of this project is to understand how a Java web application can be moved from source code to a deployed application using Jenkins.
+
+The complete workflow is:
 
 ```text
-GitHub
-  │
-  ▼
-Jenkins
-  │
-  ├── Checkout Source Code
-  ├── Maven Build (clean package)
-  ├── Generate WAR File
-  ├── Deploy WAR to Tomcat
-  └── Upload WAR to Amazon S3
+CODE
+  ↓
+BUILD
+  ↓
+TEST
+  ↓
+ARTIFACT
+  ↓
+DEPLOYMENT
+  ↓
+TOMCAT
+  ↓
+AMAZON S3
 ```
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
 ```text
-                    ┌─────────────────┐
-                    │      GitHub      │
-                    │  Java Maven App  │
-                    └────────┬─────────┘
-                             │ git clone
-                             ▼
-                    ┌─────────────────┐
-                    │     Jenkins      │
-                    │  FreeStyle Job   │
-                    └────────┬─────────┘
-                             │ mvn clean package
-                             ▼
-                    ┌─────────────────┐
-                    │     WAR File      │
-                    │      *.war        │
-                    └────────┬─────────┘
-                             │
-                 ┌───────────┴───────────┐
-                 │                       │
-          Deploy WAR                Upload Artifact
-                 │                       │
-                 ▼                       ▼
-        ┌────────────────┐      ┌─────────────────┐
-        │  Tomcat Server  │      │  Amazon S3      │
-        │     :8080       │      │    Bucket       │
-        └────────┬────────┘      └─────────────────┘
-                 │
-                 ▼
-            /mywebapp
+                         ┌─────────────────────┐
+                         │       GitHub        │
+                         │   Java Maven App    │
+                         └──────────┬──────────┘
+                                    │
+                                    │ Git Checkout
+                                    ▼
+                         ┌─────────────────────┐
+                         │      Jenkins        │
+                         │    FreeStyle Job    │
+                         └──────────┬──────────┘
+                                    │
+                                    │ Maven
+                                    │ clean package
+                                    ▼
+                         ┌─────────────────────┐
+                         │     WAR Artifact     │
+                         │        *.war         │
+                         └──────────┬──────────┘
+                                    │
+                         ┌──────────┴──────────┐
+                         │                     │
+                         │ Deploy              │ Upload
+                         ▼                     ▼
+                ┌──────────────────┐   ┌──────────────────┐
+                │  Apache Tomcat   │   │    Amazon S3     │
+                │    EC2 Server    │   │ Artifact Storage │
+                │      :8080       │   │                  │
+                └────────┬─────────┘   └──────────────────┘
+                         │
+                         ▼
+                    /mywebapp/
+                         │
+                         ▼
+                  Web Application
 ```
 
 ---
 
-## Technologies Used
+## 🛠️ Technologies Used
 
-- AWS EC2
-- Amazon Linux 2023
-- Jenkins
-- Git / GitHub
-- Apache Maven
-- Java (Amazon Corretto 21)
-- Apache Tomcat 10.x
-- Amazon S3
-- Jenkins FreeStyle Job
+| Technology | Purpose |
+|---|---|
+| GitHub | Source Code Management |
+| Git | Source Code Checkout |
+| Jenkins | CI/CD Automation |
+| Jenkins FreeStyle Job | Build and Deployment |
+| Java 21 (Amazon Corretto) | Application Runtime |
+| Maven | Build and Package |
+| Apache Tomcat 10.x | Application Server |
+| AWS EC2 | Jenkins and Tomcat Servers |
+| Amazon S3 | WAR Artifact Storage |
+| Linux Shell Script | Server Installation |
 
 ---
 
-## Repository Structure
+## ☁️ AWS Infrastructure
+
+Two separate EC2 instances are used.
+
+```text
+┌──────────────────────────────┐
+│        Jenkins EC2           │
+│                               │
+│ Java 21                      │
+│ Git                          │
+│ Maven                        │
+│ Jenkins                      │
+└──────────────┬────────────────┘
+               │
+               │ Deploy WAR
+               ▼
+┌──────────────────────────────┐
+│         Tomcat EC2           │
+│                               │
+│ Java 21                      │
+│ Apache Tomcat                │
+│ Port 8080                    │
+└──────────────────────────────┘
+
+               +
+
+┌──────────────────────────────┐
+│          Amazon S3           │
+│                               │
+│       WAR Artifacts          │
+└──────────────────────────────┘
+```
+
+---
+
+## 📂 Repository Structure
 
 ```text
 jenkins-freestyle-tomcat-deployment/
@@ -82,122 +137,147 @@ jenkins-freestyle-tomcat-deployment/
 ├── README.md
 │
 ├── scripts/
+│   ├── jenkins-install.sh
 │   └── tomcat.sh
 │
 ├── jenkins/
 │   └── freestyle-job-config.md
 │
-├── docs/
-│   ├── tomcat-setup.md
-│   ├── jenkins-setup.md
-│   ├── deployment.md
-│   └── s3-artifact-storage.md
-│
 └── screenshots/
     ├── 01-jenkins-job.png
     ├── 02-maven-build.png
-    ├── 03-tomcat-server.png
-    ├── 04-deployment-success.png
-    └── 05-s3-artifact.png
+    ├── 03-aws-ec2-servers.png
+    ├── 04-tomcat-manager.png
+    ├── 05-deployment-success.png
+    └── 06-s3-bucket.png
 ```
+
+> Note: A `Jenkinsfile` is not used in this project because it uses a Jenkins **FreeStyle Job**, not a Jenkins Pipeline.
 
 ---
 
-## CI/CD Workflow
+## 🖥️ 1. Jenkins Server Installation
 
-```text
-CODE → BUILD → TEST → ARTIFACT → DEPLOY → TOMCAT → S3
-```
+Launch an Amazon Linux EC2 instance for Jenkins.
 
-### 1. Code
-
-The Java web application source code is maintained in GitHub.
-
-Example repository:
-
-```text
-https://github.com/ReyazShaik/java-project-maven-new.git
-```
-
-### 2. Build
-
-Jenkins builds the application using Maven:
+**Install Git and Maven**
 
 ```bash
-mvn clean package
+sudo dnf install git maven -y
 ```
 
-### 3. Artifact
+Verify:
 
-Maven produces a WAR file inside the `target/` directory:
-
-```text
-target/
-└── application.war
+```bash
+git --version
+mvn -version
 ```
 
-### 4. Deployment
+**Add the Jenkins Repository**
 
-Jenkins deploys the generated WAR file to the Tomcat server.
-
-### 5. Artifact Storage
-
-Jenkins uploads the WAR file to an Amazon S3 bucket for long-term artifact storage.
-
----
-
-## AWS Infrastructure
-
-Two EC2 instances are used for this project:
-
-```text
-Server 1 → Jenkins Server
-Server 2 → Tomcat Server
+```bash
+sudo wget -O /etc/yum.repos.d/jenkins.repo \
+  https://pkg.jenkins.io/redhat-stable/jenkins.repo
 ```
 
-```text
-Jenkins EC2 ──(deploy WAR)──▶ Tomcat EC2 (port 8080)
+Import the Jenkins repository key:
+
+```bash
+sudo rpm --import \
+  https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 ```
 
----
-
-## Tomcat Server Setup
-
-Launch an **Amazon Linux 2023** EC2 instance for Tomcat.
-
-### Step 1 — Install Java
+**Install Java 21**
 
 ```bash
 sudo dnf install java-21-amazon-corretto -y
 java -version
 ```
 
-### Step 2 — Install wget
+**Install Jenkins**
+
+```bash
+sudo dnf install jenkins -y
+```
+
+**Start Jenkins**
+
+```bash
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+```
+
+**Enable Jenkins at Boot**
+
+```bash
+sudo systemctl enable jenkins
+```
+
+Jenkins URL:
+
+```text
+http://<JENKINS_PUBLIC_IP>:8080
+```
+
+**Get the Initial Jenkins Password**
+
+```bash
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+```
+
+Copy the password and complete the Jenkins initial setup wizard.
+
+### 📜 Jenkins Installation Script
+
+An automated installation script is stored at `scripts/jenkins-install.sh`.
+
+```bash
+chmod +x jenkins-install.sh
+sudo ./jenkins-install.sh
+```
+
+---
+
+## 🐱 2. Tomcat Server Installation
+
+Launch a **separate** Amazon Linux EC2 instance for Tomcat.
+
+**Install Java**
+
+```bash
+sudo dnf install java-21-amazon-corretto -y
+java -version
+```
+
+**Install wget**
 
 ```bash
 sudo dnf install wget -y
 ```
 
-### Step 3 — Download Tomcat
+**Download Apache Tomcat**
 
-Apache Tomcat releases are available at [https://dlcdn.apache.org/tomcat/](https://dlcdn.apache.org/tomcat/).
+Example version: `10.1.33`
 
 ```bash
 wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.33/bin/apache-tomcat-10.1.33.tar.gz
 ```
 
-### Step 4 — Extract Tomcat
+**Extract Tomcat**
 
 ```bash
 tar -xzvf apache-tomcat-10.1.33.tar.gz
 cd apache-tomcat-10.1.33
 ```
 
-### Step 5 — Configure Tomcat Users
+---
+
+## 🔐 3. Configure Tomcat Manager
+
+Edit the users file:
 
 ```bash
-cd apache-tomcat-10.1.33/conf
-vi tomcat-users.xml
+vi conf/tomcat-users.xml
 ```
 
 Add the required roles and a user before the closing `</tomcat-users>` tag:
@@ -205,61 +285,51 @@ Add the required roles and a user before the closing `</tomcat-users>` tag:
 ```xml
 <role rolename="manager-gui"/>
 <role rolename="manager-script"/>
+
 <user username="tomcat"
       password="<CHANGE_ME>"
       roles="manager-gui,manager-script"/>
 ```
 
-> ⚠️ Never commit real credentials to GitHub. Replace `<CHANGE_ME>` with a strong password on the server only.
+The `manager-script` role allows Jenkins to deploy the WAR file through the Tomcat Manager interface.
 
-### Step 6 — Configure Tomcat Manager Access
+> ⚠️ Never commit the real Tomcat password to GitHub. Replace `<CHANGE_ME>` with a strong password on the server only.
 
-Tomcat Manager restricts access by IP address by default.
+**Restrict Manager access (recommended)**
+
+Tomcat Manager restricts access by IP address by default:
 
 ```bash
-cd apache-tomcat-10.1.33/webapps/manager/META-INF
+cd webapps/manager/META-INF
 vi context.xml
 ```
 
-If Jenkins needs to reach the Manager application remotely, update the access restriction to allow only the Jenkins server's IP.
+If Jenkins needs to reach the Manager remotely, restrict access to the Jenkins server's IP rather than removing the restriction entirely.
 
-> ⚠️ Avoid removing IP restrictions entirely on an internet-facing server. Restrict access to the Jenkins server's private/public IP or a secured network path.
+---
 
-### Step 7 — Start Tomcat
+## ▶️ 4. Start Tomcat
 
 ```bash
 cd apache-tomcat-10.1.33/bin
 ./startup.sh
 ```
 
-Verify Tomcat is running:
+Verify:
 
 ```bash
 ps -ef | grep tomcat
+ss -lntp | grep 8080
 ```
 
----
-
-## AWS Security Group
-
-Tomcat listens on port `8080`. Allow inbound TCP `8080` in the Tomcat EC2 security group.
-
-For better security, restrict the source to the Jenkins server's IP rather than `0.0.0.0/0`.
-
----
-
-## Accessing Tomcat
+**Tomcat URLs**
 
 ```text
 http://<TOMCAT_PUBLIC_IP>:8080
 http://<TOMCAT_PUBLIC_IP>:8080/manager/html
 ```
 
-Use the credentials configured in `conf/tomcat-users.xml`.
-
----
-
-## Automated Tomcat Installation Script
+### 📜 Tomcat Installation Script
 
 `scripts/tomcat.sh`:
 
@@ -283,23 +353,36 @@ echo "Configure tomcat-users.xml and manager context.xml before production use."
 sh "${TOMCAT_DIR}/bin/startup.sh"
 ```
 
+Run it:
+
 ```bash
 chmod +x tomcat.sh
 ./tomcat.sh
-
-## Jenkins Server Setup
-
-Launch a separate Amazon Linux EC2 instance for Jenkins and install Jenkins following the [official Jenkins installation guide](https://www.jenkins.io/doc/book/installing/).
-Access Jenkins at:
-```text
-http://<JENKINS_PUBLIC_IP>:8080
 ```
 
 ---
 
-## Jenkins Plugins
+## 🔥 5. AWS Security Groups
 
-`Dashboard → Manage Jenkins → Plugins`
+**Jenkins Server** — allow inbound TCP `8080` for Jenkins UI access.
+
+**Tomcat Server** — allow inbound TCP `8080` for Jenkins/Tomcat communication.
+
+```text
+Jenkins EC2
+     │
+     │ TCP 8080
+     ▼
+Tomcat EC2
+```
+
+For production environments, restrict the source to trusted IP addresses (e.g., the Jenkins server's IP) instead of `0.0.0.0/0`.
+
+---
+
+## 🔌 6. Jenkins Plugins
+
+`Manage Jenkins → Plugins`
 
 | Plugin | Purpose |
 |---|---|
@@ -307,27 +390,34 @@ http://<JENKINS_PUBLIC_IP>:8080
 | **Maven Integration** | Run Maven builds |
 | **Deploy to Container** | Deploy WAR/EAR files to Tomcat |
 | **S3 Publisher** | Publish build artifacts to Amazon S3 |
-| **Pipeline: AWS Steps** | Optional, for Pipeline-based AWS integrations |
+| **Pipeline: AWS Steps** | Optional — for Pipeline-based AWS integrations |
 
 ---
 
-## Creating the Jenkins FreeStyle Job
+## 👷 7. Create the Jenkins FreeStyle Job
 
-`New Item → Enter item name → Freestyle project → OK`
+`Jenkins Dashboard → New Item`
 
-Example job name: `java-project-tomcat-deployment`
+- Item name: `deploytomcat`
+- Type: **Freestyle project**
+- Click **OK**
 
-### 1. Source Code Management
+---
+
+## 📦 8. Source Code Management
 
 `Source Code Management → Git`
 
 ```text
 Repository URL: https://github.com/ReyazShaik/java-project-maven-new.git
+Branch:         */main
 ```
 
-If the repository is private, add the appropriate GitHub credentials.
+If the repository is private, add the appropriate GitHub credentials. If your repository uses a different default branch, select it accordingly.
 
-### 2. Build Step
+---
+
+## 🔨 9. Configure the Maven Build
 
 `Build Steps → Invoke top-level Maven targets`
 
@@ -335,9 +425,22 @@ If the repository is private, add the appropriate GitHub credentials.
 Goals: clean package
 ```
 
-Maven generates the WAR file under `target/`.
+Build process:
 
-### 3. Deploy WAR to Tomcat
+```text
+GitHub → Checkout → Compile → Test → Package → WAR Artifact
+```
+
+The WAR file is generated inside `target/`:
+
+```text
+target/
+└── myapp.war
+```
+
+---
+
+## 🚀 10. Deploy WAR to Tomcat
 
 `Post-build Actions → Deploy war/ear to a container`
 
@@ -345,13 +448,16 @@ Maven generates the WAR file under `target/`.
 WAR/EAR files: **/*.war
 Context path:  mywebapp
 Container:     Tomcat
+Tomcat URL:    http://<TOMCAT_PUBLIC_IP>:8080
 ```
 
-Select the Tomcat version supported by your deployment plugin.
+Select the Tomcat version supported by your installed deployment plugin.
 
-### Jenkins Tomcat Credentials
+---
 
-Create Jenkins credentials for the Tomcat Manager user:
+## 🔑 11. Jenkins Tomcat Credentials
+
+`Manage Jenkins → Credentials`
 
 ```text
 Username: tomcat
@@ -359,151 +465,153 @@ Password: <TOMCAT_PASSWORD>
 ID:       tomcatcred
 ```
 
-```text
-Credentials:  tomcatcred
-Tomcat URL:   http://<TOMCAT_PUBLIC_IP>:8080
-```
+Select `tomcatcred` in the Tomcat deployment configuration.
 
-> ⚠️ Never commit `tomcatcred`, passwords, or any credentials to GitHub.
+> ⚠️ Never commit the actual password to GitHub.
 
 ---
 
-## Running the Job
+## 🪣 12. Amazon S3 Artifact Storage
 
-Click **Build Now**. Jenkins will:
-
-1. Clone the GitHub repository
-2. Run the Maven build
-3. Generate the WAR file
-4. Deploy the WAR file to Tomcat
-
-Check **Console Output** for build and deployment logs.
-
----
-
-## Testing the Application
-
-After a successful deployment, open:
+The generated WAR artifact is stored in Amazon S3.
 
 ```text
-http://<TOMCAT_PUBLIC_IP>:8080/mywebapp
-```
-
-## Storing the WAR Artifact in Amazon S3
-
-```text
-Jenkins → target/*.war → Amazon S3 (jen-test-me-reyaz/)
-```
-
-### Step 1 — Create an S3 Bucket
-
-```text
-Bucket name: jen-test-me-reyaz
+Bucket name: tomcat-warfile
 Region:      ap-south-1
-> Bucket names must be globally unique — use your own unique name.
+```
 
- ### Step 2 — Install the S3 Publisher Plugin
-Manage Jenkins → Plugins → search "S3 Publisher" → Install`, then restart Jenkins if prompted.
+> S3 bucket names must be globally unique — use your own bucket name.
 
-### Step 3 — Configure AWS Credentials
-Store AWS credentials in the Jenkins credentials store — never in the GitHub repository.
+---
+
+## 🔐 13. Configure AWS Credentials in Jenkins
+
+`Manage Jenkins → Credentials → AWS Credentials`
 
 ```text
-Jenkins → Credentials → AWS Credentials → Access Key / Secret Key
+Access Key / Secret Key
 Credential ID: s3creds
+```
 
-For Jenkins hosted on AWS, prefer an IAM role over long-lived access keys where possible.
+Use the Jenkins credentials store rather than placing AWS keys directly inside scripts or source code.
 
-### Step 4 — Configure the S3 Publisher Post-Build Step
+> For AWS-hosted Jenkins, prefer an IAM role over long-lived access keys where practical.
+
+---
+
+## 📤 14. Publish the WAR Artifact to S3
 
 `Jenkins Job → Configure → Post-build Actions → Publish artifacts to S3 bucket`
 
 ```text
-Source:            **/*.war
-Destination bucket: jen-test-me-reyaz/
+Source:             **/*.war
+Destination bucket: tomcat-warfile/
 Bucket region:      ap-south-1
 Credential:         s3creds
 ```
 
 Save the configuration.
+
 ---
 
-## Final Pipeline Flow
+## 🚀 15. Build the Jenkins Job
 
-Although this is a FreeStyle job, the logical workflow is:
+Click **Build Now**. Jenkins will:
+
+1. Checkout source code
+2. Run Maven
+3. Execute tests
+4. Generate the WAR file
+5. Deploy the WAR file to Tomcat
+6. Upload the WAR file to S3
+
+Check `Build History → Build Number → Console Output`. A successful build shows:
 
 ```text
-GitHub
-  │
-  ▼
-Jenkins (FreeStyle)
-  │
-  ▼
-Git Checkout
-  │
-  ▼
-Maven Build (mvn clean package)
-  │
-  ▼
-WAR File
-  │
-  ├──────────────┬──────────────┐
-  ▼                              ▼
-Tomcat Deployment           S3 Artifact
-  │                              │
-  ▼                              ▼
-/mywebapp                      *.war
----
-
-## Verification Checklist
-
-**GitHub**
-- [ ] Repository is accessible
-- [ ] Jenkins can clone the repository
-
-**Maven**
-- [ ] Build succeeds
-- [ ] Tests execute successfully
-- [ ] WAR file is generated
-
-**Tomcat**
-- [ ] Tomcat is running
-- [ ] Port 8080 is reachable from Jenkins
-- [ ] Manager credentials are correct
-- [ ] WAR deployment succeeds
-
-**Application**
-- [ ] `/mywebapp` is accessible
-- [ ] Application loads successfully
-
-**S3**
-- [ ] Bucket exists
-- [ ] Jenkins has upload permission
-- [ ] WAR file appears in the bucket
+BUILD SUCCESS
+```
 
 ---
 
-## Security Best Practices
+## 🌐 16. Verify Tomcat Deployment
+
+After a successful deployment, open:
+
+```text
+http://<TOMCAT_PUBLIC_IP>:8080/mywebapp/
+```
+
+The application should load successfully.
+
+---
+
+## 🪣 17. Verify the S3 Artifact
+
+`AWS Console → S3 → Your Bucket`
+
+```text
+tomcat-warfile/
+└── target/
+    └── myapp.war
+```
+
+The exact WAR filename depends on the Maven project's `pom.xml`.
+
+---
+
+## 📸 Project Screenshots
+
+| # | Screenshot | Description |
+|---|---|---|
+| 01 | Jenkins FreeStyle Job | Dashboard showing the `deploytomcat` job and a successful build |
+| 02 | Maven Build | Build output showing the generated `myapp.war` artifact |
+| 03 | AWS EC2 Infrastructure | Console showing separate Jenkins and Tomcat instances running |
+| 04 | Tomcat Manager | Tomcat Web Application Manager accessible at `/manager/html` |
+| 05 | Deployment Success | Application deployed and accessible at `/mywebapp/` |
+| 06 | Amazon S3 Bucket | S3 bucket configured to store the WAR artifact |
+
+---
+
+## 🔒 Security Best Practices
 
 Do **not** commit the following to GitHub:
 
-- AWS access keys / secret keys
-- Tomcat or Jenkins passwords
-- Private SSH keys / `.pem` files
-- Production credentials
+- ❌ AWS access keys / secret keys
+- ❌ Tomcat or Jenkins passwords
+- ❌ Private SSH keys / `.pem` files
+- ❌ Production credentials
 
 Instead, use:
 
-- Jenkins Credentials store
-- AWS IAM Roles
-- Environment variables
-- AWS Secrets Manager / SSM Parameter Store
+- ✅ Jenkins Credentials store
+- ✅ AWS IAM Roles
+- ✅ AWS Secrets Manager / SSM Parameter Store
+- ✅ Environment variables
 
-Avoid exposing the Tomcat Manager to the public internet. Prefer routing Jenkins → Tomcat traffic over a private network and restricting security group rules accordingly.
+Restrict AWS Security Group access whenever possible, and avoid exposing the Tomcat Manager directly to the public internet.
 
 ---
 
-## Useful Tomcat Commands
+## 🧹 Useful Jenkins Commands
+
+```bash
+# Check status
+sudo systemctl status jenkins
+
+# Start
+sudo systemctl start jenkins
+
+# Stop
+sudo systemctl stop jenkins
+
+# Restart
+sudo systemctl restart jenkins
+
+# Enable at boot
+sudo systemctl enable jenkins
+```
+
+## 🐱 Useful Tomcat Commands
 
 ```bash
 # Start Tomcat
@@ -523,7 +631,7 @@ cd apache-tomcat-10.1.33/logs
 tail -f catalina.out
 ```
 
-## Useful Maven Commands
+## 🔨 Useful Maven Commands
 
 ```bash
 # Build the application
@@ -534,39 +642,151 @@ mvn clean package -DskipTests
 
 # Clean previous build files
 mvn clean
+
+# Check Maven version
+mvn -version
 ```
 
-## What I Learned
+---
 
-- Launching and configuring EC2 instances on AWS
+## 🔍 Troubleshooting
+
+**Jenkins build failed**
+
+```bash
+java -version
+mvn -version
+git --version
+```
+
+Then check `Jenkins → Build History → Build Number → Console Output`.
+
+**WAR file not generated**
+
+```bash
+ls -lh target/
+```
+
+Expected:
+
+```text
+target/
+└── myapp.war
+```
+
+Make sure the Maven project is configured correctly in `pom.xml`.
+
+**Tomcat deployment failed**
+
+```bash
+ps -ef | grep tomcat
+ss -lntp | grep 8080
+tail -f apache-tomcat-10.1.33/logs/catalina.out
+```
+
+Verify: Tomcat URL, Tomcat username/password, Jenkins credential, `manager-script` role, AWS security group, and network connectivity.
+
+**Application not accessible**
+
+```bash
+ss -lntp | grep 8080
+```
+
+Check `http://<TOMCAT_PUBLIC_IP>:8080/mywebapp/` and confirm the Tomcat EC2 security group allows inbound traffic on port 8080 from the required source.
+
+**S3 upload failed**
+
+Verify: S3 bucket name, AWS region, Jenkins AWS credential, IAM permissions, and that the S3 Publisher plugin is installed. The AWS identity used by Jenkins must have permission to upload the WAR artifact.
+
+---
+
+## 📚 Key Learnings
+
+- Launching and configuring AWS EC2 instances
 - Installing Java on Amazon Linux
-- Installing and configuring Apache Tomcat manually and via script
-- Configuring the Tomcat Manager application
+- Installing Git and Maven
+- Installing and configuring Jenkins
 - Creating a Jenkins FreeStyle job and integrating it with GitHub
-- Building a Maven application and generating a WAR artifact
-- Deploying a WAR file to Tomcat from Jenkins
+- Building a Maven application and executing tests
+- Generating a WAR artifact
+- Installing and configuring Apache Tomcat and its Manager application
+- Deploying a WAR file from Jenkins to Tomcat
 - Configuring Jenkins credentials securely
 - Publishing build artifacts to Amazon S3
 - Fundamentals of AWS security groups and artifact management
 
 ---
-## Project Objective
 
-To understand a basic CI/CD deployment workflow, end to end:
+## 🎯 Complete Project Flow
 
 ```text
-Developer → GitHub → Jenkins → Maven Build → WAR Artifact → Tomcat → Web App
-                                                     │
-                                                     └──▶ Amazon S3
-
-**Stack:** 
-AWS · Jenkins · Git · GitHub · Maven · Java · Tomcat · S3
+                         GitHub
+                           │
+                           ▼
+                  Jenkins FreeStyle
+                           │
+                           ▼
+                     Git Checkout
+                           │
+                           ▼
+                  Maven clean package
+                           │
+                           ▼
+                         Tests
+                           │
+                           ▼
+                      myapp.war
+                       /       \
+                      /         \
+                     ▼           ▼
+                 Tomcat          S3
+                Deployment     Storage
+                     │           │
+                     ▼           ▼
+                /mywebapp/      *.war
+                     │
+                     ▼
+               Web Application
+```
 
 ---
 
-## Conclusion
+## ✅ Project Checklist
 
-This project demonstrates how a Java web application can be taken from source code to a deployed application using a Jenkins FreeStyle Job:
+- [x] AWS Jenkins EC2
+- [x] AWS Tomcat EC2
+- [x] Java 21
+- [x] Git
+- [x] Maven
+- [x] Jenkins installed and configured
+- [x] Jenkins FreeStyle Job
+- [x] GitHub integration
+- [x] Maven build
+- [x] Test execution
+- [x] WAR artifact generated
+- [x] Tomcat Manager configured
+- [x] WAR deployed
+- [x] Application running
+- [x] Amazon S3 bucket created
+- [x] S3 artifact storage working
+
+---
+
+## 👨‍💻 Author
+
+**Rohan Ghodke**
+DevOps Learning 
+
+**Technologies:** AWS · Jenkins · Git · GitHub · Maven · Java · Apache Tomcat · Amazon S3 · Linux
+
+---
+
+## ⭐ Conclusion
+
+This project demonstrates a practical CI/CD workflow using a Jenkins FreeStyle Job. The Java web application is taken from source code in GitHub, built with Maven, packaged as a WAR file, deployed to Apache Tomcat, and stored as an artifact in Amazon S3.
+
 ```text
-CODE → BUILD → TEST → ARTIFACT → DEPLOY → TOMCAT → STORE IN S3
-It provides a foundational, practical understanding of a Jenkins-based CI/CD deployment workflow.
+CODE → BUILD → TEST → ARTIFACT → DEPLOYMENT → TOMCAT → S3 ARTIFACT STORAGE
+```
+
+This project provides a strong foundation for understanding Jenkins automation, Java application deployment, Apache Tomcat, AWS EC2, and artifact management.
