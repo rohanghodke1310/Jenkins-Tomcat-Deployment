@@ -1,5 +1,5 @@
 # Jenkins-Tomcat-Deployment
-# Day 6 — Jenkins FreeStyle Job: WAR Deployment on Tomcat
+# Jenkins FreeStyle Job: WAR Deployment on Tomcat
 
 ## Project Overview
 
